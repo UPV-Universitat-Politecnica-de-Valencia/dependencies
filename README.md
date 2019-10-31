@@ -10,4 +10,3 @@ Works with dependecies of:
 
 Notes: 
 - It's preliminar version
-- It's in Spanish
