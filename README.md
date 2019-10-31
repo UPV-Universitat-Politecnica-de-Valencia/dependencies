@@ -9,5 +9,5 @@ Works with dependecies of:
 
 
 Notes: 
-- Its preliminar version
-- Its in Spanish
+- It's preliminar version
+- It's in Spanish
