@@ -1,17 +1,16 @@
 <?php
-$padres=array(1162,1165,1166);
+$roots=array(1162,1165,1166);
 
-$tabula='&nbsp;&nbsp;&nbsp;&nbsp;';
-$flecha='&#9493;&#9473;';
+$tab='&nbsp;&nbsp;&nbsp;&nbsp;';
+$arrow='&#9493;&#9473;';
 
-echo "<h1>Esquema de dependencias</h1>";
-//echo ("<table border=1><tr><td><h3>Vera</h3></td><td><h3>Alcoi</h3></td><td><h3>Gand&iacute;a</h3></td></tr><tr>");
+echo "<h1>Dependencies Map</h1>";
 echo ("<table border=1><tr>");
-foreach ($padres as $pid) {
+foreach ($roots as $pid) {
     echo ("<td valign='top'>");
-    $padre=dbFetchRows("select hostname, device_id from devices where device_id=$pid");
-    echo ("<p><a href='https://seti.upv.es/device/device={$padre[0]['device_id']}/'>{$padre[0]['hostname']}</a></p>");
-    $arbol=dbFetchRows("with recursive children_cte (child_device_id, parent_device_id, path, level) as (
+    $root=dbFetchRows("select hostname, device_id from devices where device_id=$pid");
+    echo ("<p><a href='/device/device={$root[0]['device_id']}/'>{$root[0]['hostname']}</a></p>");
+    $tree=dbFetchRows("with recursive children_cte (child_device_id, parent_device_id, path, level) as (
       select child_device_id, parent_device_id, CAST(child_device_id AS CHAR(500)) AS path, 1 as level
       from device_relationships
       where parent_device_id = $pid
@@ -22,19 +21,16 @@ foreach ($padres as $pid) {
       select hostname, child_device_id, path, level  from children_cte cc
       inner join devices d on d.device_id = cc.child_device_id order by path");
     $n=0;
-    foreach ($arbol as $hoja) {
-        if ($hoja['level']==1 && $n>400) {
+    foreach ($tree as $leaf) {
+        if ($leaf['level']==1 && $n>400) {
             echo ("</td><td valign='top'>");
-            echo ("<p><a href='https://seti.upv.es/device/device={$padre[0]['device_id']}/'>{$padre[0]['hostname']}</a></p>");
+            echo ("<p><a href='/device/device={$root[0]['device_id']}/'>{$root[0]['hostname']}</a></p>");
             $n=0;
             }
-        echo ("<p>".str_repeat($tabula,$hoja['level']).$flecha."<a href='https://seti.upv.es/device/device={$hoja['child_device_id']}/'>{$hoja['hostname']}</a></p>");
+        echo ("<p>".str_repeat($tab,$leaf['level']).$arrow."<a href='/device/device={$leaf['child_device_id']}/'>{$leaf['hostname']}</a></p>");
         $n++;
         }
     echo ("</td>");
     }
 
 echo ("</tr></table>");
-//echo "<hr><pre>";
-//print_r($arbol);
-//echo "</pre>";
